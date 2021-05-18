@@ -26,10 +26,11 @@ def data_loaders(models_cfg, valid_split = 0.1, test_split = 0.1, random_state =
     x_train, x_valid, y_train, y_valid = train_test_split(
         x_tv, y_tv, test_size=valid_split, random_state=random_state)
 
-    models_cfg['models'] = [{}]*models_cfg['nr_models']
+    models_cfg['models'] = []
     data_len = x_train.shape[0] // models_cfg['nr_models']
 
     for i in range(models_cfg['nr_models']):
+        models_cfg['models'].append({})
         models_cfg['models'][i]['loaders'] = {}
 
         m_data_x = x_train[i*data_len : (i + 1)*data_len]

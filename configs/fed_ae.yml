@@ -13,7 +13,7 @@ model:
 dev: 'cuda:0'
 nr_models: 3
 batch_size: 64
-local_epochs: 5
-rounds: 2
+local_epochs: 2
+rounds: 5
 val_metric: 'auc'
 
