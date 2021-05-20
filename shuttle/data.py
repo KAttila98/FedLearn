@@ -8,8 +8,6 @@ def load_shuttle():
     inputs = real_mat['X']
     labels = real_mat['y']
 
-    inputs = (inputs - np.mean(inputs)) / np.std(inputs)
-
     return inputs, labels
 
 class ShuttleDataset(Dataset):

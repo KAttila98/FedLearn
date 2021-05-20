@@ -1,19 +1,17 @@
 dataset: 'shuttle'
 model:
   name: 'ae'
-  nr_enc_lyrs: 3
+  nr_enc_lyrs: 1
   hidden_sizes:
-    - 7
-    - 3
-    - 2
+    - 5
   optimizer: 'Adam'
-  loss: 'L1Loss'
-  lr: 0.01
-  anomaly_trhold: 0.9
+  loss: 'MSELoss'
+  lr: 0.02
+  anomaly_trhold: 0.92851
 dev: 'cuda:0'
 nr_models: 3
 batch_size: 64
 local_epochs: 2
-rounds: 5
-val_metric: 'auc'
+rounds: 2
+val_metric: 'accuracy'
 

@@ -35,7 +35,7 @@ class AutoEncoder(nn.Module):
 
     def init_weights(self, m):
         if type(m) in [nn.Linear]:
-            torch.nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
+            torch.nn.init.kaiming_normal_(m.weight, nonlinearity='relu') # ugyanaz az init!!
             m.bias.data.fill_(0.01)
 
 
@@ -94,7 +94,7 @@ def validate_ae(model_cfg, data, kwargs):
             y_hat_list.append(output)
             output_sorted = output.sort().values
             th_value = output_sorted[int(output.shape[0] * kwargs['anomaly_trhold']) - 1].item()
-            pred_list.append(torch.where(output >= th_value, 1.0, 0.0))
+            pred_list.append(torch.where(output > th_value, 1.0, 0.0))
 
         y_true = torch.cat(y_true_list, dim=0).cpu().numpy()
         y_hat = torch.cat(y_hat_list, dim=0).cpu().numpy()
@@ -125,7 +125,7 @@ def predict_ae(model_cfg, data, kwargs):
             output = loss(x_hat, X).mean(dim = 1).view(-1)
             output_sorted = output.sort().values
             th_value = output_sorted[int(output.shape[0] * kwargs['anomaly_trhold']) - 1].item()
-            preds.append(torch.where(output >= th_value, 1.0, 0.0))
+            preds.append(torch.where(output > th_value, 1.0, 0.0))
 
         preds = torch.cat(preds, dim=0).cpu().numpy()
 

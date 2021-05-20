@@ -20,7 +20,6 @@ def run():
     os.makedirs(f'{args.log_dir}/{name}/{time}', exist_ok=True)
     models_cfg['writers'] = {m['name']: SummaryWriter(f'{args.log_dir}/{name}/{time}/{m["name"]}')
                              for m in models_cfg['models']}
-
     fed_avg_training(models_cfg)
 
 if __name__ == '__main__':

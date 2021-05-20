@@ -9,6 +9,7 @@ optimizers = {
 
 losses = {
     'L1Loss': torch.nn.L1Loss,
+    'MSELoss': torch.nn.MSELoss,
     'BCE': torch.nn.BCELoss
 }
 
@@ -29,10 +30,14 @@ def build_models(models_cfg):
         m['net'] = model_cls(models_cfg['model']).to(m['dev'])
 
         if 'optimizer' in models_cfg['model']:
-
-            m['net'].apply(m['net'].init_weights)
+            if i == 0:
+                m['net'].apply(m['net'].init_weights)
+            else:
+                m['net'].load_state_dict(models_cfg['models'][0]['net'].state_dict())
             m['optimizer'] = optimizers[models_cfg['model']['optimizer']](m['net'].parameters(), lr=models_cfg['model']['lr'])
             m['loss'] = losses[models_cfg['model']['loss']](reduction='none')
+
+            #print(models_cfg['models'][i]['net'].state_dict()['net.enc_1.0.weight'])
 
     return models_cfg
 
