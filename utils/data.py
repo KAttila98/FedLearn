@@ -55,19 +55,30 @@ def data_loaders(models_cfg, valid_split = 0.1, test_split = 0.1, random_state =
             m_data_x = x_train[i*data_len : (i + 1)*data_len]
             m_data_y = y_train[i*data_len : (i + 1)*data_len]
 
-        dataset = datasets[models_cfg['dataset']](x=m_data_x, y=m_data_y)
-        loader = DataLoader(dataset, batch_size=models_cfg['batch_size'], pin_memory=True)
-        models_cfg['models'][i]['loaders']['train'] = loader
 
-        models_cfg['model']['input_size'] = dataset.input_size
-        models_cfg['model']['output_size'] = dataset.output_size
+        if models_cfg['model']['name'] !="loda":
+            bs = models_cfg['batch_size']
+            
+        dataset = datasets[models_cfg['dataset']](x=m_data_x, y=m_data_y)
+        if models_cfg['model']['name'] =="loda":
+            bs = len(dataset)
+        loader = DataLoader(dataset, batch_size=bs, pin_memory=True)
+        models_cfg['models'][i]['loaders']['train'] = loader
+        
+        if models_cfg['model']['name'] !="loda":
+            models_cfg['model']['input_size'] = dataset.input_size
+            models_cfg['model']['output_size'] = dataset.output_size
 
         val_dataset = datasets[models_cfg['dataset']](x=x_valid, y=y_valid)
-        val_loader = DataLoader(val_dataset, batch_size=models_cfg['batch_size'], pin_memory=True)
+        if models_cfg['model']['name'] =="loda":
+            bs = len(val_dataset)
+        val_loader = DataLoader(val_dataset, batch_size=bs, pin_memory=True)
         models_cfg['models'][i]['loaders']['val'] = val_loader
 
         test_dataset = datasets[models_cfg['dataset']](x=x_test, y=y_test)
-        test_loader = DataLoader(test_dataset, batch_size=models_cfg['batch_size'], pin_memory=True)
+        if models_cfg['model']['name'] =="loda":
+            bs = len(test_dataset)
+        test_loader = DataLoader(test_dataset, batch_size=bs, pin_memory=True)
         models_cfg['models'][i]['loaders']['test'] = test_loader
 
     return models_cfg

@@ -19,13 +19,15 @@ models = {'ae': AutoEncoder, "loda": LODA}
 def build_models(models_cfg):
 
     model_cls = models.get(models_cfg['model']['name'])
+    # print(model_cls)
 
     if not model_cls:
         raise KeyError("No appropriate model found for this config")
 
-    if model_cls != "loda":
-        for i, m in enumerate(models_cfg['models']):
-            m['name'] = f'm{i}'
+
+    for i, m in enumerate(models_cfg['models']):
+        m['name'] = f'{models_cfg["model"]["name"]}_{i}'
+        if models_cfg['model']['name'] != "loda":
             if 'cuda' in models_cfg['dev']:
                 m['dev'] = models_cfg['dev'] if torch.cuda.is_available() else 'cpu'
 

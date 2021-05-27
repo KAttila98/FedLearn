@@ -12,8 +12,7 @@ from scipy import special
 
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, Normalizer
 from sklearn.random_projection import SparseRandomProjection
-
-from tqdm import tqdm
+from sklearn.metrics import average_precision_score, roc_auc_score, recall_score, accuracy_score
 
 
 class LODA:
@@ -101,12 +100,12 @@ class LODA:
         if self.dens_meth == "hist_old":
             if self.n_bins is None:
                 self.n_bins = int(2 * (X.shape[0] ** (1/3.)))+1  # Rice rule
-                print(self.n_bins)
+                # print(self.n_bins)
 
             self.histograms_ = np.zeros((self.n_random_cuts, self.n_bins))
             self.limits_ = np.zeros((self.n_random_cuts, self.n_bins + 1))
 
-            for i in tqdm(range(self.n_random_cuts)):
+            for i in range(self.n_random_cuts):
                 self.histograms_[i, :], self.limits_[i, :] = np.histogram(
                     projected_data[i, :], bins=self.n_bins, density=False)
                 self.histograms_[i, :] += 1e-12
@@ -153,13 +152,16 @@ class LODA:
 
             # print(self.prnbins_)
 
-            for i in tqdm(range(self.n_random_cuts)):
+            for i in range(self.n_random_cuts):
                 prd = projected_data[i, :]
                 bins = np.floor((prd - self.prmin_[i]) / self.prbw_[i]).astype(np.int32) 
                 # print(bins)
                 bins[bins == self.prnbins_[i]] = self.prnbins_[i] - 1
+                # try:
                 self.hists_.append(np.bincount(bins, minlength=self.prnbins_[i]) / X.shape[0] + 1e-12)
                 # print(np.bincount(bins).shape)
+                # except ValueError:
+                #     print(bins)
 
         ##########################################################################
         # calculate the scores for the training samples
@@ -260,7 +262,7 @@ class LODA:
         pred_scores = np.zeros([projected_data.shape[1], 1])  # n * 1
 
         if self.dens_meth == "hist_old":
-            for i in tqdm(range(self.n_random_cuts)):
+            for i in range(self.n_random_cuts):
                 # projected_data = self.projections_[i, :].dot(X.T)
                 inds = np.searchsorted(self.limits_[i, :self.n_bins - 1],
                                        projected_data[i, :], side='left')
@@ -269,7 +271,7 @@ class LODA:
 
         if self.dens_meth == "histogram":
             extr = -np.log(1e-15)
-            for i in tqdm(range(self.n_random_cuts)):
+            for i in range(self.n_random_cuts):
                 prd = projected_data[i, :]
                 bins = np.floor((prd - self.prmin_[i]) / self.prbw_[i]).astype(np.int32)
                 bins[np.abs(prd - self.prmax_[i]) <= 1e-15] -= 1
@@ -419,14 +421,14 @@ class LODA:
             raise ValueError(method,
                              'is not a valid probability conversion method')
 
-    def valid_metrics(self, X, y_true, treshold=None):
+    def valid_metrics(self, X, y_true, threshold=None):
 
         anoscores = self.decision_function(X)
 
         if threshold is None:
             threshold = self.threshold_
-        ano_labels = (anoscores > treshold).astype('int').ravel()
-
+        ano_labels = (anoscores > threshold).astype('int').ravel()
+        # print(y_true.shape, anoscores.shape)
         auc = roc_auc_score(y_true, anoscores)
         ap = average_precision_score(y_true, anoscores)
         acc = accuracy_score(y_true, ano_labels)

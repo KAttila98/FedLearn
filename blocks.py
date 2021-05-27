@@ -40,3 +40,13 @@ def log(models_cfg, _round, results, data, metric):
               f"Round {_round}.\t"
               f"{metric}_{data}={res:.5f}\t")
         writer.add_scalar(f'{metric}/{data}', res, _round)
+    if models_cfg['model']['name'] =="loda":
+        for m in models:
+            res = results[f"{m['name']}_fed"][metric]
+            writer = writers[f"{m['name']}"]
+            print(f"{m['name']}_fed\t"
+                f"Round {_round}.\t"
+                f"{metric}_{data}={res:.5f}\t")
+            writer.add_scalar(f'{metric}/{data}', res, _round)
+        
+

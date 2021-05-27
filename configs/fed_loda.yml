@@ -1,11 +1,8 @@
 dataset: 'shuttle'
 model:
-  n_random_cuts: 100
-  dens_estim_method : "histogram"
+  n_random_cuts: 200
+  standardize: False
   name: 'loda'
-nr_models: 3
-batch_size: 64
-local_epochs: 2
-rounds: 5
-val_metric: 'auc'
+nr_models: 5
+val_metric: 'av_prec'
 

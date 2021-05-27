@@ -1,9 +1,9 @@
 import numpy as np
-from loda_dumb import LODA
+from models.loda_dumb import LODA
 from sklearn.metrics import average_precision_score, roc_auc_score, recall_score, accuracy_score
 
 class FedLODA:
-    def __init__(self, n_random_cuts = 100, **kwargs):
+    def __init__(self, n_random_cuts = 100, name="loda", **kwargs):
         self.models = []
         self.sizes = []
         self.loda_extra_args = kwargs
@@ -29,8 +29,8 @@ class FedLODA:
         self.main_loda = LODA(dens_estim_method = "histogram",
             n_random_cuts = self.n_proj,
             **self.loda_extra_args)
-        self.proj_mat = self.main_loda._projection(n_components)
-        self.main_loda.projections_ = self.proj_mat
+        proj_mat = self.main_loda._projection(n_components)
+        self.main_loda.projections_ = proj_mat
 
         #########################################################################
         # federated learning of the histogram parameters
@@ -44,14 +44,14 @@ class FedLODA:
         all_obs = 0
         for i, (X, c) in enumerate(zip(X_list, contams)):
 
-            projected_data = self.proj_mat.dot(X.T).T
+            projected_data = proj_mat.dot(X.T).T
 
             if len(projected_data.shape) != 2:
                 projected_data = projected_data.reshape(-1, 1)
                 if len(projected_data.shape) != 2:
                     raise ValueError("Data must be of shape (obs, dims).")
             obs = projected_data.shape[0]
-            print(projected_data.shape)
+            # print(projected_data.shape)
 
             all_min[i,:] = np.min(projected_data, axis=0)
             all_max[i,:] = np.max(projected_data, axis=0)
@@ -71,7 +71,7 @@ class FedLODA:
         assert np.all(fed_bw>0)
 
         fed_n_bins = np.ceil((fed_max - fed_min) / fed_bw).astype(np.int32) + 1
-        print(fed_n_bins)
+        # print(fed_n_bins)
 
         assert len(fed_n_bins) == self.n_proj
 
@@ -99,7 +99,7 @@ class FedLODA:
                         n_bins = fed_n_bins,
                         n_random_cuts=self.n_proj,
                         **self.loda_extra_args)
-            loda.fit(X, predef_projmat = self.proj_mat, 
+            loda.fit(X, predef_projmat = proj_mat, 
                      predef_mins=fed_min, predef_maxs=fed_max)
                      
             # print([i.shape for i in loda.hists_])
@@ -114,6 +114,7 @@ class FedLODA:
 
         self.fed_contam = np.mean(contams)
         self.fitted = True
+        self.proj_mat = proj_mat
 
         return self
 
@@ -137,13 +138,13 @@ class FedLODA:
 
         return pred_scores
 
-    def valid_metrics(self, X, y_true, treshold=None):
+    def valid_metrics(self, X, y_true, threshold=None):
 
         anoscores = self.decision_function(X)
 
         if threshold is None:
             threshold = np.percentile(anoscores, 100 * (1 - self.fed_contam))
-        ano_labels = (anoscores > treshold).astype('int').ravel()
+        ano_labels = (anoscores > threshold).astype('int').ravel()
 
         auc = roc_auc_score(y_true, anoscores)
         ap = average_precision_score(y_true, anoscores)
