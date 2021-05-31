@@ -2,6 +2,7 @@ import torch
 from models.autoencoder import AutoEncoder
 from models.loda_dumb import LODA
 from torch.optim import Adam, SGD
+import torch.nn.functional as F
 
 optimizers = {
     'Adam': Adam,
