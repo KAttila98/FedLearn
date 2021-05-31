@@ -1,0 +1,15 @@
+dataset: 'shuttle'
+model:
+  name: ''
+  optimizer: 'SGD'
+  loss: 'cross_entropy'
+  lr: 0.0001
+  momentum: 0.9
+  anomaly_trhold: 0.92851
+dev: 'cuda:0'
+nr_models: 3
+batch_size: 64
+local_epochs: 2
+rounds: 2
+val_metric: 'accuracy'
+
