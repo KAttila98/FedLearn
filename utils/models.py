@@ -11,10 +11,11 @@ optimizers = {
 losses = {
     'L1Loss': torch.nn.L1Loss,
     'MSELoss': torch.nn.MSELoss,
-    'BCE': torch.nn.BCELoss
+    'BCE': torch.nn.BCELoss,
+    'cross_entropy': F.binary_cross_entropy
 }
 
-models = {'ae': AutoEncoder, "loda": LODA}
+models = {'ae': AutoEncoder, "loda": LODA} # Itt a GAN esetében kell egy a generátornak meg egy a discriminatornak?
 
 def build_models(models_cfg):
 
