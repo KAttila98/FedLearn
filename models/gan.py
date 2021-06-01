@@ -107,7 +107,7 @@ def train_gan(model_cfg, data):
 
         # Train generator
         # create fake labels
-        trick = torch.tensor(np.array([1] * noise_size), dtype=torch.float32).unsqueeze(dim=1).to(device)
+        trick = torch.tensor(np.array([1] * noise_size), dtype=torch.float32).unsqueeze(dim=1).to(dev)
         discriminator.eval()  # freeze the discriminator
 
         generator.train()  # enable training mode for the generator
