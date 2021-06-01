@@ -121,4 +121,4 @@ def train_gan(model_cfg, data):
         for param in discriminator.parameters():
             param.requires_grad = True
             
-        return generator_loss, discriminator_loss
+    return generator_loss, discriminator_loss
