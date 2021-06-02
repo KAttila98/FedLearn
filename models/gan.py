@@ -51,7 +51,13 @@ class Discriminator(nn.Module):
             nn.init.xavier_uniform_(m.weight)
             m.bias.data.fill_(0.01)
             
-
+class Gan(nn.Module):
+    def __init__(self, kwargs):
+        super().__init__() # Ez így elég vagy super(Generator, slef).__init__()
+        
+        self.generator = Generator(kwargs)
+        self.discriminator = Discriminator(kwargs)
+            
 def train_gan(model_cfg, data):
     
     dev = model_cfg['dev']
