@@ -139,37 +139,36 @@ def train_gan(model_cfg, data):
     return (generator_loss + discriminator_loss) / 2
 
 def validate_gan(model_cfg, data, kwargs):
-    # net = model_cfg['net']
-    # loss = model_cfg['loss']
-    #
-    # loader = model_cfg['loaders'][data]
-    # dev = model_cfg['dev']
-    # net.eval()
-    #
-    # y_true_list = []
-    # y_hat_list = []
-    # pred_list = []
-    #
-    # with torch.no_grad():
-    #     for b in loader:
-    #         X = b["x_data"].to(dev)
-    #         y_data = b["y_data"].view(-1).to(dev)
-    #         y_true_list.append(y_data)
-    #         x_hat = net(X)
-    #         output = loss(x_hat, X).mean(dim=1).view(-1)
-    #         y_hat_list.append(output)
-    #         output_sorted = output.sort().values
-    #         th_value = output_sorted[int(output.shape[0] * kwargs['anomaly_trhold']) - 1].item()
-    #         pred_list.append(torch.where(output > th_value, 1.0, 0.0))
-    #
-    #     y_true = torch.cat(y_true_list, dim=0).cpu().numpy()
-    #     y_hat = torch.cat(y_hat_list, dim=0).cpu().numpy()
-    #     preds = torch.cat(pred_list, dim=0).cpu().numpy()
-    #
-    #     eq = y_true == preds
-    #     accuracy = np.mean(eq)
-    #
-    #     auc = roc_auc_score(y_true, y_hat)
+    net = model_cfg['net'].discriminator
+    loader = model_cfg['loaders'][data]
+    dev = model_cfg['dev']
+    loss = F.binary_cross_entropy
+    net.eval()
+    
+    y_true_list = []
+    y_hat_list = []
+    pred_list = []
+    
+    with torch.no_grad():
+        for b in loader:
+            X = b["x_data"].to(dev)
+            y_data = b["y_data"].view(-1).to(dev)
+            y_true_list.append(y_data)
+            x_hat = net(X)
+            output = loss(x_hat, X).mean(dim=1).view(-1)
+            y_hat_list.append(output)
+            output_sorted = output.sort().values
+            th_value = output_sorted[int(output.shape[0] * kwargs['anomaly_trhold']) - 1].item()
+            pred_list.append(torch.where(output > th_value, 1.0, 0.0))
+    
+        y_true = torch.cat(y_true_list, dim=0).cpu().numpy()
+        y_hat = torch.cat(y_hat_list, dim=0).cpu().numpy()
+        preds = torch.cat(pred_list, dim=0).cpu().numpy()
+    
+        eq = y_true == preds
+        accuracy = np.mean(eq)
+    
+        auc = roc_auc_score(y_true, y_hat)
 
         return {
             'accuracy': 0,
@@ -177,10 +176,10 @@ def validate_gan(model_cfg, data, kwargs):
         }
 
 def predict_gan(model_cfg, data, kwargs):
-    net = model_cfg['net']
+    net = model_cfg['net'].discriminator
     loader = model_cfg['loaders'][data]
     dev = model_cfg['dev']
-    loss = model_cfg['loss']
+    loss = F.binary_cross_entropy
     net.eval()
 
     preds = []
@@ -194,5 +193,6 @@ def predict_gan(model_cfg, data, kwargs):
             preds.append(torch.where(output > th_value, 1.0, 0.0))
 
         preds = torch.cat(preds, dim=0).cpu().numpy()
-
+    
+    
     return preds
