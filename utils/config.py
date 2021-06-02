@@ -4,7 +4,7 @@ import yaml
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Federated anomaly detection")
-    parser.add_argument("--models_cfg", help="Models config file", type=str, default="configs\\fed_ae.yml")
+    parser.add_argument("--models_cfg", help="Models config file", type=str, default="configs\\fed_gan.yml")
     parser.add_argument("--log_dir", help="Logging directory", type=str, default="logs")
 
     return parser.parse_args()

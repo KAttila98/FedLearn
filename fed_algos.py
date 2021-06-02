@@ -1,10 +1,11 @@
 from models.autoencoder import *
+from models.gan import *
 from blocks import train_for_epochs, weight_averaging, log
 from fed_loda import FedLODA
 
-train_funcs = {'ae': train_ae}
-valid_funcs = {'ae': validate_ae}
-predict_funcs = {'ae': predict_ae}
+train_funcs = {'ae': train_ae, 'gan': train_gan}
+valid_funcs = {'ae': validate_ae, 'gan': validate_gan}
+predict_funcs = {'ae': predict_ae, 'gan': predict_gan}
 
 def fed_avg_training(models_cfg, federated = True):
 

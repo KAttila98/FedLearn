@@ -38,6 +38,10 @@ class AutoEncoder(nn.Module):
             torch.nn.init.kaiming_normal_(m.weight, nonlinearity='relu') # ugyanaz az init!!
             m.bias.data.fill_(0.01)
 
+    def init_opt_and_loss(self, m, optimizer, loss, kwargs):
+        m['optimizer'] = optimizer(m['net'].parameters(), lr=kwargs['lr'])
+        m['loss'] = loss(reduction='none')
+
 
 def train_ae(model_cfg, data):
 

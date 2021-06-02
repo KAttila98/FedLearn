@@ -1,5 +1,6 @@
 import torch
 from models.autoencoder import AutoEncoder
+from models.gan import Gan
 from models.loda_dumb import LODA
 from torch.optim import Adam, SGD
 import torch.nn.functional as F
@@ -16,7 +17,7 @@ losses = {
     'cross_entropy': F.binary_cross_entropy
 }
 
-models = {'ae': AutoEncoder, "loda": LODA} # Itt a GAN esetében kell egy a generátornak meg egy a discriminatornak?
+models = {'ae': AutoEncoder, "loda": LODA, "gan": Gan} # Itt a GAN esetében kell egy a generátornak meg egy a discriminatornak?
 
 def build_models(models_cfg):
 
@@ -40,9 +41,10 @@ def build_models(models_cfg):
                     m['net'].apply(m['net'].init_weights)
                 else:
                     m['net'].load_state_dict(models_cfg['models'][0]['net'].state_dict())
-                m['optimizer'] = optimizers[models_cfg['model']['optimizer']](m['net'].parameters(), lr=models_cfg['model']['lr'])
-                m['loss'] = losses[models_cfg['model']['loss']](reduction='none')
-
+                # m['optimizer'] = optimizers[models_cfg['model']['optimizer']](m['net'].parameters(), lr=models_cfg['model']['lr'])
+                # m['loss'] = losses[models_cfg['model']['loss']](reduction='none')
+                m['net'].init_opt_and_loss(m, optimizer=optimizers[models_cfg['model']['optimizer']],
+                                           loss=losses[models_cfg['model']['loss']], kwargs=models_cfg['model'])
                 #print(models_cfg['models'][i]['net'].state_dict()['net.enc_1.0.weight'])
 
     return models_cfg
