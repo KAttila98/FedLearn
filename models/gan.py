@@ -154,8 +154,8 @@ def validate_gan(model_cfg, data, kwargs):
             X = b["x_data"].to(dev)
             y_data = b["y_data"].view(-1).to(dev)
             y_true_list.append(y_data)
-            x_hat = net(X)
-            output = loss(x_hat, X).mean(dim=1).view(-1)
+            output = net(X)
+            # output = loss(x_hat, X).mean(dim=1).view(-1)
             y_hat_list.append(output)
             output_sorted = output.sort().values
             th_value = output_sorted[int(output.shape[0] * kwargs['anomaly_trhold']) - 1].item()
@@ -171,8 +171,8 @@ def validate_gan(model_cfg, data, kwargs):
         auc = roc_auc_score(y_true, y_hat)
 
         return {
-            'accuracy': 0,
-            'auc': 0,
+            'accuracy': accuracy,
+            'auc': auc,
         }
 
 def predict_gan(model_cfg, data, kwargs):
@@ -186,8 +186,8 @@ def predict_gan(model_cfg, data, kwargs):
     with torch.no_grad():
         for b in loader:
             X = b["x_data"].to(dev)
-            x_hat = net(X)
-            output = loss(x_hat, X).mean(dim = 1).view(-1)
+            output = net(X)
+            # output = loss(x_hat, X).mean(dim = 1).view(-1)
             output_sorted = output.sort().values
             th_value = output_sorted[int(output.shape[0] * kwargs['anomaly_trhold']) - 1].item()
             preds.append(torch.where(output > th_value, 1.0, 0.0))

@@ -20,6 +20,16 @@ def fed_avg_training(models_cfg, federated = True):
             for m in models_cfg['models']:
                 train_for_epochs(_round=_round, epochs=models_cfg['local_epochs'], m=m, train_func=train_func)
 
+            print(f'Round: {_round} -- no_fed_validation {models_cfg["val_metric"]}: ')
+            results_tr = {}
+            results_test = {}
+            for m in models_cfg['models']:
+                results_tr[m['name']] = valid_func(model_cfg=m, data='train', kwargs=models_cfg['model'])
+                results_test[m['name']] = valid_func(model_cfg=m, data='test', kwargs=models_cfg['model'])
+                # print(results_test[m['name']])
+            log(models_cfg, _round, results_tr, 'train', models_cfg['val_metric'])
+            log(models_cfg, _round, results_test, 'test', models_cfg['val_metric'])
+
             if federated:
                 print(f'federated averaging')
                 weight_averaging(models_cfg['models'])
