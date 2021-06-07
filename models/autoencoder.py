@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 import numpy as np
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import average_precision_score, roc_auc_score
 
 class AutoEncoder(nn.Module):
     def __init__(self, kwargs):
@@ -108,10 +108,12 @@ def validate_ae(model_cfg, data, kwargs):
         accuracy = np.mean(eq)
 
         auc = roc_auc_score(y_true, y_hat)
+        ap = average_precision_score(y_true, y_hat)
 
         return {
             'accuracy': accuracy,
             'auc': auc,
+            'av_prec': ap,
         }
 
 def predict_ae(model_cfg, data, kwargs):

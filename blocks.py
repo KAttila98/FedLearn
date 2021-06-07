@@ -34,12 +34,12 @@ def log(models_cfg, _round, results, data, metric):
     models = models_cfg['models']
     writers = models_cfg['writers']
     for m in models:
-        res = results[m['name']][metric]
+        res = results[m['name']]
         writer = writers[m['name']]
         print(f"{m['name']}\t"
               f"Round {_round}.\t"
-              f"{metric}_{data}={res:.5f}\t")
-        writer.add_scalar(f'{metric}/{data}', res, _round)
+              f"{data}_scores={res}\t")
+        writer.add_scalar(f'{metric}/{data}', res[metric], _round)
     if models_cfg['model']['name'] =="loda":
         for m in models:
             res = results[f"{m['name']}_fed"][metric]
