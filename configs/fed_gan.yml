@@ -10,8 +10,8 @@ model:
   anomaly_trhold: 0.92851
   data_size: 64
 dev: 'cuda:0'
-nr_models: 3
+nr_models: 5
 batch_size: 64
-local_epochs: 2
-rounds: 2
-val_metric: 'accuracy'
+local_epochs: 3
+rounds: 3
+val_metric: 'auc'
