@@ -159,7 +159,7 @@ def validate_gan(model_cfg, data, kwargs):
             y_hat_list.append(output)
             #output_sorted = output.sort().values
             #th_value = output_sorted[int(output.shape[0] * kwargs['anomaly_trhold']) - 1].item()
-            th_value = torch.quantile(output.values, kwargs['anomaly_trhold'])
+            th_value = torch.quantile(output, kwargs['anomaly_trhold'])
             pred_list.append(torch.where(output > th_value, 1.0, 0.0))
     
         y_true = torch.cat(y_true_list, dim=0).cpu().numpy()
