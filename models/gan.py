@@ -2,7 +2,7 @@ import math
 import numpy as np
 import torch
 import torch.nn as nn
-from sklearn.metrics import average_precision_score, roc_auc_score
+from sklearn.metrics import average_precision_score, roc_auc_score, accuracy_score
 import torch.nn.functional as F
 
 # Generator
@@ -157,17 +157,16 @@ def validate_gan(model_cfg, data, kwargs):
             output = net(X)
             # output = loss(x_hat, X).mean(dim=1).view(-1)
             y_hat_list.append(output)
-            output_sorted = output.sort().values
-            th_value = output_sorted[int(output.shape[0] * kwargs['anomaly_trhold']) - 1].item()
+            #output_sorted = output.sort().values
+            #th_value = output_sorted[int(output.shape[0] * kwargs['anomaly_trhold']) - 1].item()
+            th_value = torch.quantile(output.values, kwargs['anomaly_trhold'])
             pred_list.append(torch.where(output > th_value, 1.0, 0.0))
     
         y_true = torch.cat(y_true_list, dim=0).cpu().numpy()
         y_hat = torch.cat(y_hat_list, dim=0).cpu().numpy()
         preds = torch.cat(pred_list, dim=0).cpu().numpy()
     
-        eq = y_true == preds
-        accuracy = np.mean(eq)
-    
+        accuracy = accuracy_score(y_true, preds)
         auc = roc_auc_score(y_true, y_hat)
         ap = average_precision_score(y_true, y_hat)
 
